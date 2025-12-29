@@ -228,6 +228,11 @@ public class Renderer {
         return hotbar.getSelectedItem();
     }
 
+    /** Get the hotbar instance */
+    public Hotbar getHotbar() {
+        return hotbar;
+    }
+
     /** Setup orthographic view for farm rendering */
     public void setupFarmView() {
         try (var stack = stackPush()) {
