@@ -37,11 +37,19 @@ public class Game {
         input.update();
         renderer.updateBox(input.getMouseX(), input.getMouseY(), input.isLeftMousePressed());
 
-        // Handle drag-based tilling/watering
+        // Handle drag-based tilling/watering with tool validation
         handleDragTools();
     }
 
     private void handleDragTools() {
+        // Get the currently dragged item from the hotbar
+        HotbarItem draggedItem = renderer.getHotbar().getDraggedItem();
+        
+        // Only process actions if a tool is actively being dragged
+        if (draggedItem == null) {
+            return;
+        }
+
         float mouseX = input.getMouseX();
         float mouseY = input.getMouseY();
 
@@ -49,30 +57,12 @@ public class Game {
         int gridY = farmGrid.worldToGridY(mouseY);
 
         // Skip invalid coordinates
-        if (gridX < 0 || gridX >= GRID_WIDTH || gridY < 0 || gridY >= GRID_HEIGHT) return;
-
-        // Left mouse = hoe, right mouse = watering can
-        if (input.isLeftMousePressed()) {
-            farmGrid.tillTile(gridX, gridY);
+        if (gridX < 0 || gridX >= GRID_WIDTH || gridY < 0 || gridY >= GRID_HEIGHT) {
+            return;
         }
-        if (input.isRightMousePressed()) {
-            farmGrid.waterTile(gridX, gridY);
-        }
-    }
 
-    private void handleToolUse() {
-        HotbarItem selectedItem = renderer.getSelectedItem();
-        if (selectedItem == null) return;
-
-        float mouseX = input.getMouseX();
-        float mouseY = input.getMouseY();
-
-        // Convert mouse position to grid coordinates
-        int gridX = farmGrid.worldToGridX(mouseX);
-        int gridY = farmGrid.worldToGridY(mouseY);
-
-        // Use tool based on type
-        switch (selectedItem.getToolType()) {
+        // Perform action based on the dragged tool type
+        switch (draggedItem.getToolType()) {
             case HOE:
                 farmGrid.tillTile(gridX, gridY);
                 break;
@@ -80,7 +70,10 @@ public class Game {
                 farmGrid.waterTile(gridX, gridY);
                 break;
             case NONE:
-                // No action for non-tool items
+                // Provide feedback for invalid item usage
+                if (input.isLeftMouseClicked() || input.isRightMouseClicked()) {
+                    System.out.println("Cannot use " + draggedItem.getName() + " on farmland - not a farming tool");
+                }
                 break;
         }
     }
