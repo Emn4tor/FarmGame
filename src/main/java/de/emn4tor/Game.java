@@ -70,10 +70,7 @@ public class Game {
                 farmGrid.waterTile(gridX, gridY);
                 break;
             case NONE:
-                // Provide feedback for invalid item usage
-                if (input.isLeftMouseClicked() || input.isRightMouseClicked()) {
-                    System.out.println("Cannot use " + draggedItem.getName() + " on farmland - not a farming tool");
-                }
+                // No action for non-tool items
                 break;
         }
     }
